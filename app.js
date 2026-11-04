@@ -6,7 +6,7 @@ async function enviarMensaje() {
     const texto = userInput.value.trim();
     if (!texto) return;
 
-    // Agregar mensaje del usuario al chat
+    // 1. Mostrar mensaje del usuario
     messagesContainer.innerHTML += `
         <div class="message user">
             <div class="message-content">${escaparHTML(texto)}</div>
@@ -15,35 +15,40 @@ async function enviarMensaje() {
     userInput.value = '';
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-    // Indicador de carga
+    // 2. Crear mensaje temporal de carga
     const tempBotId = 'bot-' + Date.now();
     messagesContainer.innerHTML += `
         <div class="message bot" id="${tempBotId}">
             <img src="neo/imag/5.jpg" alt="Reina Roja" class="avatar-lateral" onerror="this.src='https://via.placeholder.com/36/dc143c/ffffff?text=RR'">
-            <div class="message-content">Procesando orden...</div>
+            <div class="message-content">Procesando...</div>
         </div>`;
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
     try {
-        const respuesta = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt: texto })
-        });
-
+        // 3. Petición directa a tu Worker de Cloudflare
+        const respuesta = await fetch(`https://redqueen-ai.fkasudje.workers.dev/?prompt=${encodeURIComponent(texto)}`);
         const data = await respuesta.json();
+
         const botMsgDiv = document.getElementById(tempBotId).querySelector('.message-content');
-        botMsgDiv.innerText = data.response || data.error || "Sin respuesta del módulo backend.";
+        
+        // Asignar respuesta o error devuelto por el servidor
+        if (data && data.response) {
+            botMsgDiv.innerText = data.response;
+        } else if (data && data.error) {
+            botMsgDiv.innerText = `[Error de Servidor]: ${data.error}`;
+        } else {
+            botMsgDiv.innerText = "Reina Roja: Módulo en espera de configuración backend.";
+        }
 
     } catch (error) {
         const botMsgDiv = document.getElementById(tempBotId).querySelector('.message-content');
-        botMsgDiv.innerText = "Error de conexión con el servidor.";
+        botMsgDiv.innerText = "Error de conexión con el Worker de Cloudflare.";
     }
 
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
-function escaparHTML(str) {
+function escapingHTML(str) {
     return str.replace(/[&<>'"]/g, 
         tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
 }
