@@ -20,7 +20,7 @@ async function enviarMensaje() {
     userInput.value = '';
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-    // 2. Mensaje temporal de carga
+    // 2. Crear bloque de respuesta temporal
     const tempBotId = 'bot-' + Date.now();
     messagesContainer.innerHTML += `
         <div class="message bot" id="${tempBotId}">
@@ -30,7 +30,7 @@ async function enviarMensaje() {
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
     try {
-        // Petición POST a la función interna de Cloudflare Pages
+        // PETICIÓN A RUTA LOCAL RELATIVA (Sin dominios externos de Workers)
         const respuesta = await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -43,14 +43,14 @@ async function enviarMensaje() {
         if (data && data.response) {
             botMsgDiv.innerText = data.response;
         } else if (data && data.error) {
-            botMsgDiv.innerText = `[Error de Servidor]: ${data.error}`;
+            botMsgDiv.innerText = `[Error de Pages]: ${data.error}`;
         } else {
-            botMsgDiv.innerText = "Reina Roja: Módulo en espera de datos.";
+            botMsgDiv.innerText = "Reina Roja: Módulo activo, sin respuesta del motor.";
         }
 
     } catch (error) {
         const botMsgDiv = document.getElementById(tempBotId).querySelector('.message-content');
-        botMsgDiv.innerText = "Error de comunicación con el servidor interno.";
+        botMsgDiv.innerText = "Error al conectar con la ruta interna /api/chat de Pages.";
     }
 
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
