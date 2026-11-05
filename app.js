@@ -3,21 +3,28 @@ const userInput = document.getElementById('userInput');
 const messagesContainer = document.getElementById('messages');
 const welcomeMsg = document.getElementById('welcome-msg');
 
-let idiomaActual = 'es'; // Por defecto español
+let idiomaActual = 'es';
+
+const configIdiomas = {
+    es: { placeholder: "Escribe tu consulta o comando técnico...", welcome: "Entorno de control activo para DEMIAN ALEX3NDER. Sistemas en línea. ¿Qué vector de análisis o código vamos a ejecutar?" },
+    en: { placeholder: "Enter your technical query or command...", welcome: "Active control environment for DEMIAN ALEX3NDER. Systems online. What analysis or code vector shall we execute?" },
+    jp: { placeholder: "セキュリティのコマンドや質問をここに入力してください...", welcome: "DEMIAN ALEX3NDER のアクティブな制御環境。システムオンライン。どの分析またはコードベクトルを実行しますか?" },
+    zh: { placeholder: "在此输入您的技术咨询或命令...", welcome: "DEMIAN ALEX3NDER 的活动控制环境。系统在线。我们要执行什么分析或代码向量？" },
+    ko: { placeholder: "기술 문의 또는 명령을 여기에 입력하세요...", welcome: "DEMIAN ALEX3NDER를 위한 활성 제어 환경. 시스템 온라인. 어떤 분석 또는 코드 벡터를 실행할까요?" },
+    fr: { placeholder: "Entrez votre commande ou requête technique...", welcome: "Environnement de contrôle actif pour DEMIAN ALEX3NDER. Systèmes en ligne. Quel vecteur d'analyse ou de code allons-nous exécuter ?" },
+    it: { placeholder: "Inserisci il tuo comando o quesito tecnico...", welcome: "Ambiente di controllo attivo per DEMIAN ALEX3NDER. Sistemi online. Quale vettore di analisi o codice eseguiamo?" }
+};
 
 function setLanguage(lang) {
     idiomaActual = lang;
-    document.getElementById('btn-es').classList.remove('active');
-    document.getElementById('btn-jp').classList.remove('active');
+    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
     
-    if (lang === 'es') {
-        document.getElementById('btn-es').classList.add('active');
-        userInput.placeholder = "Escribe tu consulta o comando técnico...";
-        welcomeMsg.innerText = "Entorno de control activo para DEMIAN ALEX3NDER. Sistemas en línea. ¿Qué vector de análisis o código vamos a ejecutar?";
-    } else {
-        document.getElementById('btn-jp').classList.add('active');
-        userInput.placeholder = "セキュリティのコマンドや質問をここに入力してください...";
-        welcomeMsg.innerText = "DEMIAN ALEX3NDER のアクティブな制御環境。システムオンライン。どの分析またはコードベクトルを実行しますか?";
+    const activeBtn = document.getElementById(`btn-${lang}`);
+    if (activeBtn) activeBtn.classList.add('active');
+
+    if (configIdiomas[lang]) {
+        userInput.placeholder = configIdiomas[lang].placeholder;
+        if (welcomeMsg) welcomeMsg.innerText = configIdiomas[lang].welcome;
     }
 }
 
