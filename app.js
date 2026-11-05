@@ -1,6 +1,7 @@
 let idiomaActual = 'es';
 let sesiones = JSON.parse(localStorage.getItem('reina_roja_sesiones')) || [];
 let sesionActualId = localStorage.getItem('reina_roja_actual_id') || null;
+let vocesDisponibles = [];
 
 const configIdiomas = {
     es: { placeholder: "Escribe tu consulta o comando técnico...", welcome: "Entorno de control activo para DEMIAN ALEX3NDER. Sistemas en línea. ¿Qué vector de análisis o código vamos a ejecutar?" },
@@ -12,18 +13,77 @@ const configIdiomas = {
     it: { placeholder: "Inserisci il tuo comando o quesito tecnico...", welcome: "Ambiente di controllo attivo per DEMIAN ALEX3NDER. Sistemi online. Quale vettore di analisi o codice eseguiamo?" }
 };
 
+// --- MÓDULO DE VOZ (SÍNTESIS FEMENINA Y MULTILINGÜE) ---
+function cargarVoces() {
+    if ('speechSynthesis' in window) {
+        vocesDisponibles = window.speechSynthesis.getVoices();
+    }
+}
+
+if ('speechSynthesis' in window) {
+    window.speechSynthesis.onvoiceschanged = cargarVoces;
+    cargarVoces();
+}
+
 function reproducirVoz(texto) {
     if (!('speechSynthesis' in window)) {
-        alert("La síntesis de voz no está soportada en este navegador.");
+        alert("Tu navegador no soporta reproducción de voz.");
         return;
     }
+
+    // Detener cualquier audio previo
     window.speechSynthesis.cancel();
+
+    // Asegurar tener voces cargadas
+    if (vocesDisponibles.length === 0) {
+        vocesDisponibles = window.speechSynthesis.getVoices();
+    }
+
     const utterance = new SpeechSynthesisUtterance(texto);
-    const codigosVoz = { es: 'es-ES', en: 'en-US', jp: 'ja-JP', zh: 'zh-CN', ko: 'ko-KR', fr: 'fr-FR', it: 'it-IT' };
-    utterance.lang = codigosVoz[idiomaActual] || 'es-ES';
+
+    // Mapeo de prefijos de idioma
+    const mapaIdiomas = { es: 'es', en: 'en', jp: 'ja', zh: 'zh', ko: 'ko', fr: 'fr', it: 'it' };
+    const prefijoBuscado = mapaIdiomas[idiomaActual] || 'es';
+
+    // Filtrar voces que coincidan con el idioma y tengan preferencia femenina
+    const vocesIdioma = vocesDisponibles.filter(v => v.lang.toLowerCase().startsWith(prefijoBuscado));
+    
+    // Buscar explícitamente una voz femenina por nombre o metadatos comunes en navegadores
+    const vozFemenina = vocesIdioma.find(v => {
+        const nombre = v.name.toLowerCase();
+        return nombre.includes('female') || 
+               nombre.includes('woman') || 
+               nombre.includes('zira') || 
+               nombre.includes('helena') || 
+               nombre.includes('mónica') || 
+               nombre.includes('monica') || 
+               nombre.includes('paulina') || 
+               nombre.includes('samantha') || 
+               nombre.includes('victoria') || 
+               nombre.includes('kyoko') || 
+               nombre.includes('haruka') || 
+               nombre.includes('hina') ||
+               nombre.includes('amelie') ||
+               nombre.includes('charlotte');
+    });
+
+    // Asignar la voz encontrada (priorizando la femenina, luego cualquier voz del idioma, o respaldo)
+    if (vozFemenina) {
+        utterance.voice = vozFemenina;
+    } else if (vocesIdioma.length > 0) {
+        utterance.voice = vocesIdioma[0];
+    } else {
+        const codigosFallBack = { es: 'es-ES', en: 'en-US', jp: 'ja-JP', zh: 'zh-CN', ko: 'ko-KR', fr: 'fr-FR', it: 'it-IT' };
+        utterance.lang = codigosFallBack[idiomaActual] || 'es-ES';
+    }
+
+    utterance.rate = 1.0;  // Velocidad de locución
+    utterance.pitch = 1.1; // Tonalidad ligeramente más aguda (perfil femenino)
+
     window.speechSynthesis.speak(utterance);
 }
 
+// --- GESTIÓN DE HISTORIAL Y SESIONES ---
 function inicializarSesiones() {
     if (sesiones.length === 0) {
         iniciarNuevaSesion();
@@ -201,7 +261,7 @@ async function enviarMensaje() {
             botContainer.appendChild(ttsButton);
 
             if (sesion) {
-                sesion.mensajes.push({ role: 'bot', content: textoRespuesta });
+                sesion.mensajes.push({ role: 'bot', content: textoRespeso = textoRespuesta });
                 guardarAlmacenamiento();
                 renderizarHistorialSidebar();
             }
