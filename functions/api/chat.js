@@ -12,8 +12,8 @@ export async function onRequestPost(context) {
             });
         }
 
-        // Modelo actualizado y activo en Cloudflare Workers AI
-        const aiResult = await env.AI.run("@cf/meta/llama-3-8b-instruct", {
+        // Usar un modelo activo con alta compatibilidad en Cloudflare Workers AI
+        const aiResult = await env.AI.run("@cf/mistral/mistral-7b-instruct-v0.1", {
             messages: [
                 {
                     role: "system",
