@@ -11,7 +11,6 @@ export async function onRequestPost(context) {
             });
         }
 
-        // Definición de idioma estricto según la selección del usuario
         let reglaIdioma = "RESPONDE ESTRICTAMENTE EN ESPAÑOL. Está prohibido usar el idioma inglés.";
         if (idioma === 'jp') {
             reglaIdioma = "RESPONDE ESTRICTAMENTE EN JAPONÉS. Está prohibido usar el idioma inglés.";
@@ -27,7 +26,8 @@ export async function onRequestPost(context) {
                     role: "user",
                     content: `[Instrucción de Idioma: ${reglaIdioma}] Consulta: ${userPrompt}`
                 }
-            ]
+            ],
+            max_tokens: 2048
         });
 
         return new Response(JSON.stringify({ response: aiResult.response }), {
