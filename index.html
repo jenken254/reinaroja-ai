@@ -8,18 +8,16 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { display: flex; flex-direction: column; background-color: #1e1e24; color: #ececf1; height: 100vh; overflow: hidden; }
         
-        #top-header { width: 100%; height: 90px; background-color: #202123; border-bottom: 1px solid #4d4d4f; display: flex; align-items: center; padding: 0 25px; gap: 15px; }
+        #top-header { width: 100%; height: 90px; background-color: #202123; border-bottom: 1px solid #4d4d4f; display: flex; align-items: center; padding: 0 20px; gap: 15px; }
         .header-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #dc143c; }
         .header-info h1 { font-size: 18px; color: #ff4d4d; letter-spacing: 0.5px; }
         .header-info p { font-size: 12px; color: #9aca3c; text-transform: uppercase; }
 
-        /* Controles de idioma y alineación derecha */
-        .header-right { margin-left: auto; display: flex; align-items: center; gap: 20px; }
-        .lang-selector { display: flex; gap: 6px; }
-        .lang-btn { background: #2b2c33; color: #ff4d4d; border: 1px solid #dc143c; padding: 6px 12px; cursor: pointer; border-radius: 4px; font-weight: bold; font-size: 13px; transition: all 0.2s; }
+        .header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+        .lang-selector { display: flex; gap: 4px; flex-wrap: wrap; }
+        .lang-btn { background: #2b2c33; color: #ff4d4d; border: 1px solid #dc143c; padding: 4px 8px; cursor: pointer; border-radius: 4px; font-weight: bold; font-size: 11px; transition: all 0.2s; }
         .lang-btn:hover, .lang-btn.active { background: #dc143c; color: #ffffff; }
 
-        /* Contenedor principal con panel de chat y panel lateral derecho */
         #main-container { display: flex; flex: 1; overflow: hidden; }
         #chat-section { flex: 1; display: flex; flex-direction: column; background-color: #343541; overflow: hidden; }
 
@@ -30,8 +28,7 @@
         .avatar-lateral { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1px solid #dc143c; flex-shrink: 0; }
         .message-content { flex: 1; word-break: break-word; }
 
-        /* Panel Lateral Derecho (Imagen e información de la Reina Roja) */
-        #side-panel { width: 300px; background-color: #202123; border-left: 1px solid #4d4d4f; display: flex; flex-direction: column; align-items: center; padding: 20px; text-align: center; gap: 15px; }
+        #side-panel { width: 280px; background-color: #202123; border-left: 1px solid #4d4d4f; display: flex; flex-direction: column; align-items: center; padding: 20px; text-align: center; gap: 15px; }
         .side-image-container { width: 180px; height: 240px; border-radius: 10px; overflow: hidden; border: 2px solid #dc143c; box-shadow: 0 0 15px rgba(220, 20, 60, 0.4); }
         .side-image-container img { width: 100%; height: 100%; object-fit: cover; }
         .side-info h3 { color: #ff4d4d; font-size: 16px; margin-bottom: 5px; }
@@ -44,6 +41,8 @@
         button#sendBtn:hover { transform: scale(1.1); }
 
 
+
+
 #messages {
     flex: 1;
     overflow-y: auto;
@@ -54,11 +53,8 @@
 }
 
 
-
-
-
         
-        /* Adaptabilidad para pantallas móviles */
+
         @media (max-width: 900px) { #side-panel { display: none; } }
     </style>
 </head>
@@ -72,7 +68,12 @@
         <div class="header-right">
             <div class="lang-selector">
                 <button class="lang-btn active" id="btn-es" onclick="setLanguage('es')">ES</button>
+                <button class="lang-btn" id="btn-en" onclick="setLanguage('en')">EN</button>
                 <button class="lang-btn" id="btn-jp" onclick="setLanguage('jp')">JP</button>
+                <button class="lang-btn" id="btn-zh" onclick="setLanguage('zh')">ZH</button>
+                <button class="lang-btn" id="btn-ko" onclick="setLanguage('ko')">KO</button>
+                <button class="lang-btn" id="btn-fr" onclick="setLanguage('fr')">FR</button>
+                <button class="lang-btn" id="btn-it" onclick="setLanguage('it')">IT</button>
             </div>
         </div>
     </div>
@@ -95,7 +96,6 @@
             </div>
         </div>
 
-        <!-- Panel Lateral Derecho con Imagen y Estado -->
         <div id="side-panel">
             <div class="side-image-container">
                 <img src="neo/imag/3.jpg" alt="Reina Roja Hologram" onerror="this.src='https://via.placeholder.com/180/202123/dc143c?text=REINA+ROJA'">
@@ -110,3 +110,5 @@
     <script src="app.js"></script>
 </body>
 </html>
+
+
