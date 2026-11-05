@@ -4,17 +4,16 @@ export async function onRequestPost(context) {
         const body = await request.json();
         const userPrompt = body.prompt || "Hola Reina Roja.";
 
-        // Verifica que el binding 'AI' esté disponible
         if (!env.AI) {
             return new Response(JSON.stringify({ 
-                error: "El binding 'AI' no está respondiendo en la configuración de Pages." 
+                error: "El binding 'AI' no está configurado en Pages." 
             }), {
                 headers: { "Content-Type": "application/json;charset=UTF-8" }
             });
         }
 
-        // Llamada al modelo Llama 3.1 8B activo en Cloudflare
-        const aiResult = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
+        // Modelo actualizado y activo en Cloudflare Workers AI
+        const aiResult = await env.AI.run("@cf/meta/llama-3-8b-instruct", {
             messages: [
                 {
                     role: "system",
