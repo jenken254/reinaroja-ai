@@ -6,64 +6,86 @@
     <title>Reina Roja AI - Entorno de Trabajo (2026)</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { display: flex; flex-direction: column; background-color: #1e1e24; color: #ececf1; height: 100vh; overflow: hidden; }
         
-        #top-header { width: 100%; height: 90px; background-color: #202123; border-bottom: 1px solid #4d4d4f; display: flex; align-items: center; padding: 0 20px; gap: 15px; }
-        .header-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #dc143c; }
-        .header-info h1 { font-size: 18px; color: #ff4d4d; letter-spacing: 0.5px; }
-        .header-info p { font-size: 12px; color: #9aca3c; text-transform: uppercase; }
+        body { display: flex; flex-direction: column; background-color: #121316; color: #ececf1; height: 100vh; overflow: hidden; }
+        
+        /* Personalización de la barra de desplazamiento */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #17171c; }
+        ::-webkit-scrollbar-thumb { background: #dc143c; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ff4d4d; }
+
+        /* Encabezado Superior */
+        #top-header { width: 100%; height: 70px; background-color: #1a1b20; border-bottom: 1px solid #dc143c44; display: flex; align-items: center; padding: 0 20px; gap: 15px; flex-shrink: 0; box-shadow: 0 2px 10px rgba(220, 20, 60, 0.15); }
+        .mobile-menu-btn { display: none; background: none; border: 1px solid #dc143c; color: #ff4d4d; font-size: 18px; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+        .header-avatar { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid #dc143c; box-shadow: 0 0 8px rgba(220, 20, 60, 0.5); }
+        .header-info h1 { font-size: 16px; color: #ff4d4d; letter-spacing: 0.8px; text-transform: uppercase; text-shadow: 0 0 5px rgba(255, 77, 77, 0.3); }
+        .header-info p { font-size: 11px; color: #9aca3c; text-transform: uppercase; font-weight: bold; }
+        
+        /* Punto indicador de estado parpadeante */
+        .status-pulse { display: inline-block; width: 8px; height: 8px; background-color: #9aca3c; border-radius: 50%; margin-right: 4px; animation: pulse 1.8s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
         .header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
         .lang-selector { display: flex; gap: 4px; flex-wrap: wrap; }
-        .lang-btn { background: #2b2c33; color: #ff4d4d; border: 1px solid #dc143c; padding: 4px 8px; cursor: pointer; border-radius: 4px; font-weight: bold; font-size: 11px; transition: all 0.2s; }
-        .lang-btn:hover, .lang-btn.active { background: #dc143c; color: #ffffff; }
+        .lang-btn { background: #212229; color: #ff4d4d; border: 1px solid #dc143c; padding: 4px 8px; cursor: pointer; border-radius: 4px; font-weight: bold; font-size: 11px; transition: all 0.2s ease-in-out; }
+        .lang-btn:hover, .lang-btn.active { background: #dc143c; color: #ffffff; box-shadow: 0 0 8px rgba(220, 20, 60, 0.6); }
 
-        #main-container { display: flex; flex: 1; overflow: hidden; }
-        #chat-section { flex: 1; display: flex; flex-direction: column; background-color: #343541; overflow: hidden; }
+        #main-container { display: flex; flex: 1; overflow: hidden; position: relative; }
 
-        #messages { flex: 1; overflow-y: auto; padding: 20px 10%; display: flex; flex-direction: column; gap: 20px; }
-        .message { display: flex; gap: 15px; padding: 15px 20px; border-radius: 8px; max-width: 85%; line-height: 1.6; }
-        .user { background-color: #2b2c33; align-self: flex-end; color: #ececf1; border: 1px solid #40414f; }
-        .bot { background-color: #444654; align-self: flex-start; border: 1px solid #565869; }
-        .avatar-lateral { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1px solid #dc143c; flex-shrink: 0; }
+        /* Panel Izquierdo: Historial */
+        #history-sidebar { width: 260px; background-color: #16171d; border-right: 1px solid #2d2e38; display: flex; flex-direction: column; padding: 15px; gap: 12px; z-index: 10; transition: transform 0.3s ease; }
+        .new-chat-btn { background-color: #dc143c; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; transition: all 0.2s; box-shadow: 0 0 10px rgba(220, 20, 60, 0.3); }
+        .new-chat-btn:hover { background-color: #ff4d4d; box-shadow: 0 0 15px rgba(255, 77, 77, 0.5); }
+        .history-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+        .history-item { background-color: #1e1f26; padding: 10px; border-radius: 6px; font-size: 12px; cursor: pointer; color: #b4b4c7; border: 1px solid transparent; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: all 0.2s; }
+        .history-item:hover, .history-item.active { background-color: #272832; border-color: #dc143c; color: #fff; box-shadow: inset 3px 0 0 #dc143c; }
+
+        /* Sección Central: Chat */
+        #chat-section { flex: 1; display: flex; flex-direction: column; background-color: #1e1e24; overflow: hidden; position: relative; }
+        #messages { flex: 1; overflow-y: auto; padding: 20px 8%; display: flex; flex-direction: column; gap: 20px; }
+        .message { display: flex; gap: 15px; padding: 15px 20px; border-radius: 8px; max-width: 85%; line-height: 1.6; position: relative; font-size: 14px; }
+        .user { background-color: #282933; align-self: flex-end; color: #ececf1; border: 1px solid #3c3d4d; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        .bot { background-color: #22232b; align-self: flex-start; border: 1px solid #3d242a; flex-direction: column; box-shadow: 0 2px 10px rgba(220, 20, 60, 0.08); }
+        .bot-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; color: #ff4d4d; font-size: 13px; }
+        .avatar-lateral { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 1px solid #dc143c; flex-shrink: 0; }
         .message-content { flex: 1; word-break: break-word; }
-
-        #side-panel { width: 280px; background-color: #202123; border-left: 1px solid #4d4d4f; display: flex; flex-direction: column; align-items: center; padding: 20px; text-align: center; gap: 15px; }
-        .side-image-container { width: 180px; height: 240px; border-radius: 10px; overflow: hidden; border: 2px solid #dc143c; box-shadow: 0 0 15px rgba(220, 20, 60, 0.4); }
-        .side-image-container img { width: 100%; height: 100%; object-fit: cover; }
-        .side-info h3 { color: #ff4d4d; font-size: 16px; margin-bottom: 5px; }
-        .side-info p { color: #8e8ea0; font-size: 12px; line-height: 1.4; }
-
-        #input-area { width: 100%; padding: 20px 10%; background-color: #202123; border-top: 1px solid #4d4d4f; }
-        .input-box { display: flex; background-color: #40414f; border-radius: 12px; border: 1px solid #565869; box-shadow: 0 4px 15px rgba(0,0,0,0.3); padding: 12px 15px; align-items: center; gap: 10px; }
-        textarea { flex: 1; background: none; border: none; color: white; resize: none; height: 24px; max-height: 120px; outline: none; font-size: 15px; }
-        button#sendBtn { background: none; border: none; color: #ff4d4d; cursor: pointer; padding: 5px 10px; font-size: 20px; transition: transform 0.2s; }
-        button#sendBtn:hover { transform: scale(1.1); }
-
-
-
-
-#messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px 10%;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-
         
+        .tts-btn { background: none; border: 1px solid #dc143c; color: #ff4d4d; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; align-self: flex-start; margin-top: 10px; transition: all 0.2s; }
+        .tts-btn:hover { background: #dc143c; color: #fff; box-shadow: 0 0 8px rgba(220, 20, 60, 0.4); }
 
-        @media (max-width: 900px) { #side-panel { display: none; } }
+        /* Entrada de texto */
+        #input-area { width: 100%; padding: 15px 8%; background-color: #16171d; border-top: 1px solid #2d2e38; }
+        .input-box { display: flex; background-color: #22232c; border-radius: 10px; border: 1px solid #3d3e4d; padding: 10px 15px; align-items: center; gap: 10px; transition: border-color 0.2s; }
+        .input-box:focus-within { border-color: #dc143c; box-shadow: 0 0 8px rgba(220, 20, 60, 0.3); }
+        textarea { flex: 1; background: none; border: none; color: white; resize: none; height: 24px; max-height: 120px; outline: none; font-size: 14px; }
+        button#sendBtn { background: none; border: none; color: #ff4d4d; cursor: pointer; padding: 5px 10px; font-size: 18px; transition: transform 0.2s; }
+        button#sendBtn:hover { transform: scale(1.15); color: #ff6666; }
+
+        /* Panel Derecho: Holograma */
+        #side-panel { width: 260px; background-color: #16171d; border-left: 1px solid #2d2e38; display: flex; flex-direction: column; align-items: center; padding: 20px; text-align: center; gap: 15px; }
+        .side-image-container { width: 160px; height: 220px; border-radius: 8px; overflow: hidden; border: 2px solid #dc143c; box-shadow: 0 0 18px rgba(220, 20, 60, 0.35); }
+        .side-image-container img { width: 100%; height: 100%; object-fit: cover; }
+        .side-info h3 { color: #ff4d4d; font-size: 14px; margin-bottom: 5px; letter-spacing: 0.5px; }
+        .side-info p { color: #8e8ea0; font-size: 11px; line-height: 1.4; }
+
+        /* Responsivo para pantallas pequeñas */
+        @media (max-width: 1000px) { #side-panel { display: none; } }
+        @media (max-width: 768px) { 
+            .mobile-menu-btn { display: block; }
+            #history-sidebar { position: absolute; left: 0; top: 0; bottom: 0; transform: translateX(-100%); width: 240px; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
+            #history-sidebar.open { transform: translateX(0); }
+            #messages, #input-area { padding-left: 4%; padding-right: 4%; }
+        }
     </style>
 </head>
 <body>
     <div id="top-header">
-        <img src="neo/imag/3.jpg" alt="Reina Roja" class="header-avatar" onerror="this.src='https://via.placeholder.com/50/dc143c/ffffff?text=RR'">
+        <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+        <img src="neo/imag/3.jpg" alt="Reina Roja" class="header-avatar" onerror="this.src='https://via.placeholder.com/42/dc143c/ffffff?text=RR'">
         <div class="header-info">
             <h1>Reina Roja AI</h1>
-            <p>● Módulo Activo - 2026</p>
+            <p><span class="status-pulse"></span> Módulo Activo - 2026</p>
         </div>
         <div class="header-right">
             <div class="lang-selector">
@@ -79,10 +101,22 @@
     </div>
 
     <div id="main-container">
+        <!-- Sidebar de Historial -->
+        <div id="history-sidebar">
+            <button class="new-chat-btn" onclick="iniciarNuevaSesion()">+ Nueva Sesión</button>
+            <div class="history-list" id="historyListContainer">
+                <!-- Las sesiones se cargan dinámicamente -->
+            </div>
+        </div>
+
+        <!-- Sección Principal de Chat -->
         <div id="chat-section">
             <div id="messages">
                 <div class="message bot">
-                    <img src="neo/imag/5.jpg" alt="Reina Roja" class="avatar-lateral" onerror="this.src='https://via.placeholder.com/36/dc143c/ffffff?text=RR'">
+                    <div class="bot-header">
+                        <img src="neo/imag/5.jpg" alt="Reina Roja" class="avatar-lateral" onerror="this.src='https://via.placeholder.com/30/dc143c/ffffff?text=RR'">
+                        <strong>Reina Roja</strong>
+                    </div>
                     <div class="message-content" id="welcome-msg">
                         Entorno de control activo para DEMIAN ALEX3NDER. Sistemas en línea. ¿Qué vector de análisis o código vamos a ejecutar?
                     </div>
@@ -96,19 +130,25 @@
             </div>
         </div>
 
+        <!-- Panel Lateral Derecho -->
         <div id="side-panel">
             <div class="side-image-container">
-                <img src="neo/imag/3.jpg" alt="Reina Roja Hologram" onerror="this.src='https://via.placeholder.com/180/202123/dc143c?text=REINA+ROJA'">
+                <img src="neo/imag/3.jpg" alt="Reina Roja Hologram" onerror="this.src='https://via.placeholder.com/160/202123/dc143c?text=REINA+ROJA'">
             </div>
             <div class="side-info">
                 <h3>CORE DEEP-SEC</h3>
-                <p>Módulo de Inteligencia Artificial Analítica v2026. Conexión cifrada de alta prioridad.</p>
+                <p>Módulo de Inteligencia Artificial Analítica v2026. Conexión cifrada activa.</p>
             </div>
         </div>
     </div>
 
+    <script>
+        // Función rápida para menú en móviles
+        function toggleSidebar() {
+            const sidebar = document.getElementById('history-sidebar');
+            sidebar.classList.toggle('open');
+        }
+    </script>
     <script src="app.js"></script>
 </body>
 </html>
-
-
