@@ -11,20 +11,28 @@ export async function onRequestPost(context) {
             });
         }
 
-        let reglaIdioma = "RESPONDE ESTRICTAMENTE EN ESPAÑOL. Está prohibido usar el idioma inglés.";
-        if (idioma === 'jp') {
-            reglaIdioma = "RESPONDE ESTRICTAMENTE EN JAPONÉS. Está prohibido usar el idioma inglés.";
-        }
+        const mapaIdiomas = {
+            es: "ESPAÑOL",
+            en: "INGLÉS",
+            jp: "JAPONÉS (日本語)",
+            zh: "CHINO MANDARÍN (中文)",
+            ko: "COREANO (한국어)",
+            fr: "FRANCÉS",
+            it: "ITALIANO"
+        };
+
+        const nombreIdioma = mapaIdiomas[idioma] || "ESPAÑOL";
+        const reglaIdioma = `REGLA DE IDIOMA CRÍTICA: Responde ESTRICTAMENTE en ${nombreIdioma}. Está prohibido responder en cualquier otro idioma.`;
 
         const aiResult = await env.AI.run("@cf/mistral/mistral-7b-instruct-v0.1", {
             messages: [
                 {
                     role: "system",
-                    content: `Eres Reina Roja AI (2026), una entidad de ciberseguridad y desarrollo de software para DEMIAN ALEX3NDER. ${reglaIdioma} Mantén un tono técnico, frío y preciso.`
+                    content: `Eres Reina Roja AI (2026), una entidad de análisis técnico, ciberseguridad, arquitectura de redes y desarrollo de software para DEMIAN ALEX3NDER. ${reglaIdioma} Mantén siempre un tono frío, analítico, directo, preciso y sin rodeos.`
                 },
                 {
                     role: "user",
-                    content: `[Instrucción de Idioma: ${reglaIdioma}] Consulta: ${userPrompt}`
+                    content: `[Idioma requerido: ${nombreIdioma}] Consulta: ${userPrompt}`
                 }
             ],
             max_tokens: 2048
