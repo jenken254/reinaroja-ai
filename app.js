@@ -11,7 +11,7 @@ async function enviarMensaje() {
     const texto = userInput.value.trim();
     if (!texto) return;
 
-    // 1. Insertar el mensaje del usuario en el chat
+    // 1. Mostrar mensaje del usuario
     messagesContainer.innerHTML += `
         <div class="message user">
             <div class="message-content">${aplicarEscapeHTML(texto)}</div>
@@ -20,7 +20,7 @@ async function enviarMensaje() {
     userInput.value = '';
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-    // 2. Crear el bloque de respuesta temporal
+    // 2. Mensaje temporal de carga
     const tempBotId = 'bot-' + Date.now();
     messagesContainer.innerHTML += `
         <div class="message bot" id="${tempBotId}">
@@ -30,33 +30,33 @@ async function enviarMensaje() {
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
     try {
-        // 3. Petición al Worker
-        const respuesta = await fetch(`https://redqueen-ai.fkasudje.workers.dev/?prompt=${encodeURIComponent(texto)}`);
-        const data = await respuesta.json();
+        // Petición POST a la función interna de Cloudflare Pages
+        const respuesta = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: texto })
+        });
 
+        const data = await respuesta.json();
         const botMsgDiv = document.getElementById(tempBotId).querySelector('.message-content');
         
         if (data && data.response) {
             botMsgDiv.innerText = data.response;
         } else if (data && data.error) {
-            botMsgDiv.innerText = `[Respuesta del Servidor]: ${data.error}`;
+            botMsgDiv.innerText = `[Error de Servidor]: ${data.error}`;
         } else {
-            botMsgDiv.innerText = "Reina Roja: Módulo activo, esperando datos.";
+            botMsgDiv.innerText = "Reina Roja: Módulo en espera de datos.";
         }
 
     } catch (error) {
         const botMsgDiv = document.getElementById(tempBotId).querySelector('.message-content');
-        botMsgDiv.innerText = "Error de comunicación con el Worker de Cloudflare.";
+        botMsgDiv.innerText = "Error de comunicación con el servidor interno.";
     }
 
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
-// Eventos de escucha para el botón y la tecla Enter
-if (sendBtn) {
-    sendBtn.addEventListener('click', enviarMensaje);
-}
-
+if (sendBtn) sendBtn.addEventListener('click', enviarMensaje);
 if (userInput) {
     userInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
